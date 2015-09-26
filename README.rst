@@ -5,6 +5,12 @@ Leonardo leonardo-system
 
 System Module to Leonardo CMS
 
+Features
+--------
+
+* install/uninstall modules from pypi in one click
+* check/update versions
+
 .. contents::
     :local:
 
