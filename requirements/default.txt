@@ -1,1 +1,1 @@
-django-leonardo>=1.0.0
+#django-leonardo>=1.0.0
