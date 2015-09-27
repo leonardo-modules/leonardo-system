@@ -1,7 +1,7 @@
 import os
 
-from django.conf import settings
 import django.dispatch
+from django.conf import settings
 from django.core import management
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
@@ -10,6 +10,7 @@ from horizon import tables
 from horizon_contrib.tables import FilterAction
 from leonardo import forms, messages
 from leonardo.utils import get_conf_from_module
+from .tables import LeonardoTable, SettingsTable
 
 server_restart = django.dispatch.Signal(providing_args=["request", "delay"])
 
@@ -96,16 +97,18 @@ class ManagementForm(forms.SelfHandlingForm):
         super(ManagementForm, self).__init__(*args, **kwargs)
 
         self.helper.layout = forms.Layout(
-            forms.Accordion('',
-                            'makemigrations',
-                            'migrate',
-                            'sync_all',
-                            forms.AccordionGroup(
-                                _('Advanced options'),
-                                'sync_force',
-                                'reload_server',
-                            )
-                            ),
+            forms.TabHolder(
+                forms.Tab('Main',
+                          'makemigrations',
+                          'migrate',
+                          'sync_all',
+                          css_id='plugins-install-main'
+                          ),
+                forms.Tab('Advance',
+                          'sync_force',
+                          'reload_server',
+                          )
+            )
         )
 
     def handle(self, request, data):
@@ -128,58 +131,6 @@ class ManagementForm(forms.SelfHandlingForm):
         else:
             return True
         return False
-
-
-class SettingsTable(tables.DataTable):
-
-    key = tables.Column('key')
-    value = tables.Column('value')
-
-    def get_object_id(self, datum):
-        return datum['key']
-
-    class Meta:
-        name = 'settings'
-        table_actions = (FilterAction,)
-
-PRETTY = """
-{% if short %}
-<div class="codeblock" tabindex="-1">
-    <pre lang="json" class="short">{{ short }}</pre>
-    <pre lang="json" class="full">{{ full }}</pre>
-{% else %}
-<div class="codeblock">
-    <pre lang="json" class="short">{{ full }}</pre>
-{% endif %}
-</div>
-"""
-
-def prettyprint(x):
-    short = None
-    full = json.dumps(json.loads(x), indent=4, ensure_ascii=False)
-
-    lines = full.split('\n')
-
-    if (len(lines) > 5):
-        short = '\n'.join(lines[:5] + ['...'])
-
-    return render_to_string(PRETTY,
-                            {"full": full, "short": short})
-
-
-class LeonardoTable(tables.DataTable):
-
-    name = tables.Column('name')
-    widgets = tables.Column('config', verbose_name='Widgets', filters=(lambda c: ', '.join(c.widgets),))
-    live_config = tables.Column('config', filters=(lambda c: c.config, prettyprint,))
-
-    def get_object_id(self, datum):
-        return datum['name']
-
-    class Meta:
-        name = 'leonardo-modules'
-        verbose_name = _('Leonardo Modules')
-        table_actions = (FilterAction,)
 
 
 class InfoForm(forms.SelfHandlingForm):
