@@ -16,7 +16,6 @@ class PluginSelectField(AutoSelect2TagField):
     search_fields = ['tag__icontains', ]
 
     def get_field_values(self, value):
-        raise Exception(value)
         return {'tag': value}
 
     def get_results(self, request, term, page, context):
@@ -32,7 +31,7 @@ class PluginSelectField(AutoSelect2TagField):
             for repo in pkgs if term in repo.name
         ]
 
-        return NO_ERR_RESP, True, res
+        return NO_ERR_RESP, False, res
 
 
 class PluginInstallForm(forms.SelfHandlingForm):
@@ -51,15 +50,19 @@ class PluginInstallForm(forms.SelfHandlingForm):
                     You may lost your data !'),)
 
     def __init__(self, *args, **kwargs):
+        kwargs.pop('request', None)
         super(PluginInstallForm, self).__init__(*args, **kwargs)
 
         self.helper.layout = forms.Layout(
-            forms.Accordion('', 'packages',
-                            forms.AccordionGroup(
-                                _('Advanced options'),
-                                'reload_server',
-                                )
-                            ),
+            forms.TabHolder(
+                forms.Tab('Main',
+                          'packages',
+                          css_id='plugins-install-main'
+                          ),
+                forms.Tab('Advance',
+                          'reload_server'
+                          )
+            )
         )
 
     def handle(self, request, data):

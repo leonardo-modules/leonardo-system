@@ -143,7 +143,10 @@ def update_packages_from_pip(query, request=None):
         try:
             from pip.commands.search import SearchCommand
             search_results = SearchCommand().search(
-                'leonardo', 'https://pypi.python.org/pypi')
+                'leonardo', dotdict({
+                    'cache_dir': '/tmp',
+                    'trusted_hosts': ['https://pypi.python.org/pypi'],
+                    'index': 'https://pypi.python.org/pypi'}))
             # serialize to dot access dict
             search_results = [dotdict(d) for d in search_results]
         except ImportError:
