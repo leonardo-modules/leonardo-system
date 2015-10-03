@@ -1,6 +1,31 @@
 CHANGES
 =======
 
+0.0.7
+-----
+
+* adapt to latest select2 and use new leonardo registry
+
+0.0.6
+-----
+
+* small fixes and cleanup
+
+0.0.5
+-----
+
+* fix pbr installation
+
+0.0.4
+-----
+
+* remove dependency to leonardo
+
+0.0.3
+-----
+
+* no dependency to leonardo for this time
+
 0.0.2
 -----
 
