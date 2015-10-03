@@ -1,37 +1,8 @@
 from django.utils.translation import ugettext_lazy as _
-from django_select2.fields import AutoSelect2TagField
-from django_select2.views import NO_ERR_RESP
+from django_select2.forms import Select2Widget
 from leonardo import forms, messages
 
 from .utils import pip_install, update_all
-
-
-class PluginSelectField(AutoSelect2TagField):
-
-    """returns list of plugins from github group or pypi
-
-    it's simple PoC !
-    """
-
-    search_fields = ['tag__icontains', ]
-
-    def get_field_values(self, value):
-        return {'tag': value}
-
-    def get_results(self, request, term, page, context):
-
-        pkgs = update_all()
-
-        res = [
-            (
-                repo.name,
-                repo.name,
-                {}
-            )
-            for repo in pkgs if term in repo.name
-        ]
-
-        return NO_ERR_RESP, False, res
 
 
 class PluginInstallForm(forms.SelfHandlingForm):
@@ -40,7 +11,7 @@ class PluginInstallForm(forms.SelfHandlingForm):
     this support new abilities like an dynamic plugin install etc..
     """
 
-    packages = PluginSelectField(label=_('Search packages'))
+    packages = forms.ChoiceField(label=_('Search packages'), widget=Select2Widget())
 
     reload_server = forms.BooleanField(
         label=_('Reload Server'), initial=False,
@@ -52,6 +23,10 @@ class PluginInstallForm(forms.SelfHandlingForm):
     def __init__(self, *args, **kwargs):
         kwargs.pop('request', None)
         super(PluginInstallForm, self).__init__(*args, **kwargs)
+
+        self.fields['packages'].choices = [
+            (repo.name, repo.name, )
+            for repo in update_all()]
 
         self.helper.layout = forms.Layout(
             forms.TabHolder(

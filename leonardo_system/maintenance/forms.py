@@ -8,8 +8,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.debug import get_safe_settings
 from horizon import tables
 from horizon_contrib.tables import FilterAction
-from leonardo import forms, messages
+from leonardo import forms, leonardo, messages
 from leonardo.utils import get_conf_from_module
+
 from .tables import LeonardoTable, SettingsTable
 
 server_restart = django.dispatch.Signal(providing_args=["request", "delay"])
@@ -155,7 +156,7 @@ class InfoForm(forms.SelfHandlingForm):
                 'name': mod,
                 'config': mod_cfg,
             })
-        leonardo_table = LeonardoTable(request, data=module_data)
+        leonardo_table = LeonardoTable(request, data=leonardo.get_modules_as_list())
 
         self.helper.layout = forms.Layout(
             forms.TabHolder(

@@ -12,32 +12,10 @@ from horizon_contrib.tables import FilterAction
 from leonardo import forms, messages
 from leonardo.utils import get_conf_from_module
 from leonardo_system.management.commands._utils import get_versions
+from django.template.loader import render_to_string
+import pprint
 
-
-PRETTY = """
-{% if short %}
-<div class="codeblock" tabindex="-1">
-    <pre lang="json" class="short">{{ short }}</pre>
-    <pre lang="json" class="full">{{ full }}</pre>
-{% else %}
-<div class="codeblock">
-    <pre lang="json" class="short">{{ full }}</pre>
-{% endif %}
-</div>
-"""
-
-
-def prettyprint(x):
-    short = None
-    full = json.dumps(json.loads(x), indent=4, ensure_ascii=False)
-
-    lines = full.split('\n')
-
-    if (len(lines) > 5):
-        short = '\n'.join(lines[:5] + ['...'])
-
-    return render_to_string(PRETTY,
-                            {"full": full, "short": short})
+pp = pprint.PrettyPrinter(indent=4)
 
 
 class SettingsTable(tables.DataTable):
@@ -55,22 +33,30 @@ class SettingsTable(tables.DataTable):
 
 class LeonardoTable(tables.DataTable):
 
-    name = tables.Column('name',
+    name = tables.Column('module',
                          filters=(lambda m: m.__name__,))
     widgets = tables.Column(
-        'config', verbose_name=_('Widgets'),
-        filters=(lambda c: ', '.join([str(w) for w in c.get('widgets', [])]),))
+        'widgets', verbose_name=_('Widgets'),
+        filters=(lambda c: ', '.join([str(w.__name__) for w in c]),))
     plugins = tables.Column(
-        'config', verbose_name=_('Plugins'),
-        filters=(lambda c: ', '.join([p[0] for p in c.get('plugins', [])]),))
-    live_config = tables.Column('config', filters=(lambda c: c.config, prettyprint,))
+        'plugins', verbose_name=_('Plugins'),
+        filters=(lambda c: ', '.join([p[0] for p in c]),))
+    live_config = tables.Column('config', filters=(lambda c: pp.pprint(c.config),))
 
-    version = tables.Column('name',
-                            verbose_name=_('Version'),
-                            filters=(lambda m: get_versions([m.__name__])[m.__name__],))
+    version = tables.Column('version',
+                            verbose_name=_('Version'))
+
+    needs_migrations = tables.Column('needs_migrations',
+                                     verbose_name=_('Needs Migrations'),
+                                     filters=(lambda c: _('Needs Migrations') if c else '-',)
+                                     )
+
+    needs_sync = tables.Column('needs_sync',
+                               verbose_name=_('Needs Sync'),
+                               filters=(lambda c: _('Needs Sync') if c else '-',))
 
     def get_object_id(self, datum):
-        return datum['name']
+        return datum.module.__name__
 
     class Meta:
         name = 'leonardo-modules'
