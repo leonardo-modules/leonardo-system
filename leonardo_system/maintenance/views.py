@@ -1,9 +1,15 @@
 
 from __future__ import absolute_import
 
+from constance.admin import ConstanceForm
 from django.utils.translation import ugettext_lazy as _
+from django.core import urlresolvers
 from leonardo.views import *
-from .forms import ServerReloadForm, ManagementForm, InfoForm
+from leonardo.views import ModalFormView
+from constance import settings, LazyConfig
+from .forms import InfoForm, ManagementForm, ServerReloadForm
+
+config = LazyConfig()
 
 
 class ServerReloadView(ModalFormView, ContextMixin, ModelFormMixin):
@@ -76,3 +82,21 @@ class ManagementView(ModalFormView, ContextMixin, ModelFormMixin):
 
     def form_invalid(self, form):
         raise Exception(form.errors)
+
+
+class ConfigUpdate(ModalFormView):
+
+    form_class = ConstanceForm
+
+    success_url = "feincms_home"
+
+    def get_success_url(self):
+        return urlresolvers.reverse(self.success_url)
+
+    def get_initial(self):
+        default_initial = ((name, default)
+                           for name, (default, help_text) in settings.CONFIG.items())
+        # Then update the mapping with actually values from the backend
+        initial = dict(default_initial,
+                       **dict(config._backend.mget(settings.CONFIG.keys())))
+        return initial

@@ -41,14 +41,13 @@ def pip_install(packages, request=None, reload_server=False):
     """
 
     if PIP:
-
         # install
         try:
-            pip.main(['install'] + list(packages))
+            pip.main(['install', packages])
             if request:
                 messages.success(request, _(
                     'Packages %s was successfully installed,\
-                     please restart your server.' % list(packages)))
+                     please restart your server.' % packages))
         except Exception as e:
             if request:
                 messages.error(request, _(

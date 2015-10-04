@@ -1,3 +1,4 @@
+
 from django.utils.translation import ugettext_lazy as _
 from django_select2.forms import Select2Widget
 from leonardo import forms, messages
@@ -6,6 +7,7 @@ from .utils import pip_install, update_all
 
 
 class PluginInstallForm(forms.SelfHandlingForm):
+
     """simple form for installing packages
 
     this support new abilities like an dynamic plugin install etc..
@@ -24,6 +26,7 @@ class PluginInstallForm(forms.SelfHandlingForm):
         kwargs.pop('request', None)
         super(PluginInstallForm, self).__init__(*args, **kwargs)
 
+        # I think that this is not best solution
         self.fields['packages'].choices = [
             (repo.name, repo.name, )
             for repo in update_all()]

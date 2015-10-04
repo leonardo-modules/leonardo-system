@@ -14,11 +14,17 @@ Features
 .. contents::
     :local:
 
+Requirements
+------------
+
+* pip 1.5 +
+
 Installation
 ------------
 
 .. code-block:: bash
 
+    pip install --upgrade pip
     pip install leonardo-system
 
 Read More

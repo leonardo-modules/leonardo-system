@@ -22,6 +22,3 @@ class PluginInstallView(ModalFormView, ContextMixin, ModelFormMixin):
         context['form_submit'] = _('Install')
         context['heading'] = _('Install Packages')
         return context
-
-    def form_invalid(self, form):
-        raise Exception(form.errors)
