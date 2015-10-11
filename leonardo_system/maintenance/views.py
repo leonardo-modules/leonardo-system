@@ -90,6 +90,11 @@ class ConfigUpdate(ModalFormView):
 
     success_url = "feincms_home"
 
+    def get_context_data(self, *args, **kwargs):
+        context = super(ConfigUpdate, self).get_context_data(*args, **kwargs)
+        context['modal_size'] = 'lg'
+        return context
+
     def get_success_url(self):
         return urlresolvers.reverse(self.success_url)
 

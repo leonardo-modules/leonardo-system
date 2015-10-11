@@ -1,1 +1,2 @@
 pip==7.1.2
+horizon-contrib>=2015.10.4

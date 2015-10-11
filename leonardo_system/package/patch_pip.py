@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 
 import contextlib
 from pip.utils.logging import get_indentation, _log_state

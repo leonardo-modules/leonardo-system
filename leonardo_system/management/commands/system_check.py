@@ -2,10 +2,11 @@ from __future__ import unicode_literals
 
 from optparse import make_option
 
-from django.conf import settings
-from ._utils import get_versions, pp
+from ._utils import pp
 
 from django.core.management.base import BaseCommand, NoArgsCommand
+
+from leonardo_system.pip import check_versions
 
 
 class Command(BaseCommand):
@@ -23,7 +24,7 @@ class Command(BaseCommand):
 
     def handle(self, **options):
 
-        result = get_versions(settings.INSTALLED_APPS)
+        result = check_versions(only_leonardo=True)
 
         output = pp.pprint(result)
 

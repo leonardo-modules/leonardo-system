@@ -148,24 +148,16 @@ class InfoForm(forms.SelfHandlingForm):
 
         table = SettingsTable(request, data=_settings)
 
-        module_data = []
-
-        for mod in getattr(settings, '_APPS', []):
-            mod_cfg = get_conf_from_module(mod)
-            module_data.append({
-                'name': mod,
-                'config': mod_cfg,
-            })
         leonardo_table = LeonardoTable(request, data=leonardo.get_modules_as_list())
 
         self.helper.layout = forms.Layout(
             forms.TabHolder(
+                forms.Tab('Leonardo modules',
+                          forms.HTML(leonardo_table.render())
+                          ),
                 forms.Tab('Settings',
                           forms.HTML(table.render())
                           ),
-                forms.Tab('Leonardo modules',
-                          forms.HTML(leonardo_table.render())
-                          )
             )
         )
 
