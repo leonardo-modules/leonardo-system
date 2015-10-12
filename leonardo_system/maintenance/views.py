@@ -99,9 +99,8 @@ class ConfigUpdate(ModalFormView):
         return urlresolvers.reverse(self.success_url)
 
     def get_initial(self):
-        default_initial = ((name, default)
-                           for name, (default, help_text) in settings.CONFIG.items())
-        # Then update the mapping with actually values from the backend
-        initial = dict(default_initial,
-                       **dict(config._backend.mget(settings.CONFIG.keys())))
+        from constance import config
+        initial = {}
+        for key in dir(config):
+            initial[key] = getattr(config, key)
         return initial
