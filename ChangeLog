@@ -1,6 +1,14 @@
 CHANGES
 =======
 
+0.0.8
+-----
+
+* some action and system check
+* add pip requirement
+* settings view, fix pip installing
+* update changelog
+
 0.0.7
 -----
 
