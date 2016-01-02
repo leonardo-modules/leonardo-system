@@ -6,10 +6,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.core import urlresolvers
 from leonardo.views import *
 from leonardo.views import ModalFormView
-from constance import settings, LazyConfig
+from constance import settings, config
 from .forms import InfoForm, ManagementForm, ServerReloadForm
-
-config = LazyConfig()
 
 
 class ServerReloadView(ModalFormView, ContextMixin, ModelFormMixin):
@@ -99,9 +97,11 @@ class ConfigUpdate(ModalFormView):
         return urlresolvers.reverse(self.success_url)
 
     def get_initial(self):
-        default_initial = ((name, default)
-                           for name, (default, help_text) in settings.CONFIG.items())
+
+        default_initial = ((name, options[0])
+                           for name, options in settings.CONFIG.items())
         # Then update the mapping with actually values from the backend
         initial = dict(default_initial,
                        **dict(config._backend.mget(settings.CONFIG.keys())))
+
         return initial
