@@ -12,6 +12,7 @@ LEONARDO_OPTGROUP = 'System'
 LEONARDO_URLS_CONF = 'leonardo_system.urls'
 LEONARDO_PAGE_ACTIONS = ['system/module_actions.html']
 LEONARDO_ORDERING = 150
+LEONARDO_DASHBOARD_MENU = ['leonardo_system.menu.system_menu']
 
 
 class Config(AppConfig):
