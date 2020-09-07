@@ -13,6 +13,12 @@ from leonardo.utils import get_conf_from_module
 
 from .tables import LeonardoTable, SettingsTable
 
+RESTORE_FLAG_CHOICES = (
+    ('no_option', '------'),
+    ('create_flag', _('Create restore flag')),
+    ('delete_flag', _('Delete restore flag'))
+)
+
 server_restart = django.dispatch.Signal(providing_args=["request", "delay"])
 
 
@@ -94,6 +100,10 @@ class ManagementForm(forms.SelfHandlingForm):
                     For successfull reload must be run under Supervisor !\
                     You may lost your data !'),)
 
+    restore_flag = forms.ChoiceField(
+        label=_('Restore flag'), required=False, choices=RESTORE_FLAG_CHOICES,
+        help_text=_('Warning: when you delete this flag restart will cause restore of all data!'),)
+
     def __init__(self, *args, **kwargs):
         super(ManagementForm, self).__init__(*args, **kwargs)
 
@@ -108,12 +118,15 @@ class ManagementForm(forms.SelfHandlingForm):
                 forms.Tab('Advance',
                           'sync_force',
                           'reload_server',
+                          ),
+                forms.Tab('Backup/Restore',
+                          'restore_flag',
                           )
             )
         )
 
     def handle(self, request, data):
-
+        restore_flag_path = settings.MEDIA_ROOT + 'DATA_RESTORED'
         try:
             if data.get('makemigrations', None):
                 management.call_command(
@@ -127,6 +140,22 @@ class ManagementForm(forms.SelfHandlingForm):
             if data.get('reload_server', None):
                 import os
                 os.kill(os.getpid(), 9)
+            # create/delete DATA_RESTORED file in media root - restart app will cause restore of all data
+            if data.get('restore_flag') == 'create_flag':
+                import os
+                if not os.path.exists(restore_flag_path):
+                    flag = open(restore_flag_path, 'w+')
+                    flag.close()
+                    messages.success(request, 'Restore flag was created.')
+                else:
+                    messages.info(request, 'Restore flag already exists.')
+            if data.get('restore_flag') == 'delete_flag':
+                import os
+                if os.path.exists(restore_flag_path):
+                    os.remove(restore_flag_path)
+                    messages.success(request, 'Restore flag was removed.')
+                else:
+                    messages.info(request, 'Restore flag does not exist.')
         except Exception as e:
             messages.error(request, str(e))
         else:
@@ -148,7 +177,8 @@ class InfoForm(forms.SelfHandlingForm):
 
         table = SettingsTable(request, data=_settings)
 
-        leonardo_table = LeonardoTable(request, data=leonardo.get_modules_as_list())
+        leonardo_table = LeonardoTable(
+            request, data=leonardo.get_modules_as_list())
 
         self.helper.layout = forms.Layout(
             forms.TabHolder(
