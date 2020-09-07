@@ -4,19 +4,19 @@
 {% if HORIZON_CONFIG.system_module and request.user.is_superuser %}
 <div class="btn-group btn-group-justified" style='margin-top: 5px;'>
   <a href="{% url 'server_reload' %}" title="{% trans 'Reload server' %}" class="ajax-modal btn btn-default hidden-xs">
-    <span class="glyphicon glyphicon-refresh"></span>
+    <i class="fa fa-refresh" aria-hidden="true"></i>
   </a>
   <a href="{% url 'system_info' %}" title="{% trans 'System Info' %}" class="ajax-modal btn btn-default hidden-xs">
-    <span class="glyphicon glyphicon-info-sign"></span>
+    <i class="fa fa-info-circle" aria-hidden="true"></i>
   </a>
   <a href="{% url 'plugin_install' %}" title="{% trans 'Install Plugins' %}" class="ajax-modal btn btn-default hidden-xs">
-    <span class="glyphicon glyphicon-plus"></span>
+    <i class="fa fa-plus" aria-hidden="true"></i>
   </a>
   <a href="{% url 'server_management' %}" title="{% trans 'Management commands' %}" class="ajax-modal btn btn-default hidden-xs">
-    <span class="fa fa-ambulance"></span>
+    <i class="fa fa-ambulance" aria-hidden="true"></i>
   </a>
   <a href="{% url 'live_config' %}" title="{% trans 'Settings' %}" class="ajax-modal btn btn-default hidden-xs">
-    <span class="glyphicon glyphicon-cog"></span>
+    <i class="fa fa-cogs" aria-hidden="true"></i>
   </a>
 </div>
 {% endif %}
